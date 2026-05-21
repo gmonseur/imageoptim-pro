@@ -1,11 +1,11 @@
-name: Build Multi-Platform
+name: Build Multi-Platformwq
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:  # Permet de déclencher manuellement
+  workflow_dispatch:
 
 jobs:
   build-linux:
@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     
@@ -35,7 +35,7 @@ jobs:
           image_resizer.py
     
     - name: Upload Linux build
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ImageOptimPro-Linux
         path: dist/ImageOptimPro
@@ -47,7 +47,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     
@@ -61,7 +61,7 @@ jobs:
         pyinstaller --onefile --windowed --name=ImageOptimPro --icon=icon.ico --hidden-import=tkinter --hidden-import=tkinter.filedialog --hidden-import=tkinter.ttk image_resizer.py
     
     - name: Upload Windows build
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ImageOptimPro-Windows
         path: dist/ImageOptimPro.exe
@@ -73,7 +73,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     
@@ -93,7 +93,7 @@ jobs:
           image_resizer.py
     
     - name: Upload macOS build
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ImageOptimPro-macOS
         path: dist/ImageOptimPro
