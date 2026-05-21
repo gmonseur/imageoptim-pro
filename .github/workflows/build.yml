@@ -1,0 +1,99 @@
+name: Build Multi-Platform
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Permet de déclencher manuellement
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pillow
+    
+    - name: Build for Linux
+      run: |
+        pyinstaller --onefile --windowed \
+          --name=ImageOptimPro \
+          --icon=icon.png \
+          --hidden-import=tkinter \
+          --hidden-import=tkinter.filedialog \
+          --hidden-import=tkinter.ttk \
+          image_resizer.py
+    
+    - name: Upload Linux build
+      uses: actions/upload-artifact@v3
+      with:
+        name: ImageOptimPro-Linux
+        path: dist/ImageOptimPro
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pillow
+    
+    - name: Build for Windows
+      run: |
+        pyinstaller --onefile --windowed --name=ImageOptimPro --icon=icon.ico --hidden-import=tkinter --hidden-import=tkinter.filedialog --hidden-import=tkinter.ttk image_resizer.py
+    
+    - name: Upload Windows build
+      uses: actions/upload-artifact@v3
+      with:
+        name: ImageOptimPro-Windows
+        path: dist/ImageOptimPro.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pillow
+    
+    - name: Build for macOS
+      run: |
+        pyinstaller --onefile --windowed \
+          --name=ImageOptimPro \
+          --icon=icon.icns \
+          --hidden-import=tkinter \
+          --hidden-import=tkinter.filedialog \
+          --hidden-import=tkinter.ttk \
+          image_resizer.py
+    
+    - name: Upload macOS build
+      uses: actions/upload-artifact@v3
+      with:
+        name: ImageOptimPro-macOS
+        path: dist/ImageOptimPro
