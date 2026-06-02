@@ -55,7 +55,11 @@ jobs:
         run: flet build ${{ matrix.target }} --project ImageOptimPro --module-name image_resizer --verbose
 
       - name: List build output
-        run: find build/ -type f | sort
+        run: |
+          echo "=== Tous les dossiers (depth 6) ==="
+          find . -maxdepth 6 -type d | sort
+          echo "=== Binaire ImageOptimPro ==="
+          find / -name "ImageOptimPro" -not -path "*/proc/*" 2>/dev/null || echo "Non trouvé"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
