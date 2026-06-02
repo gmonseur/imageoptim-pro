@@ -4,6 +4,4 @@ description = "Redimensionnez et compressez vos images par lot"
 product_name = "ImageOptim Pro"
 org = "be.gmonseur"
 company = "gmonseur.be"
-
-[tool.flet.dependencies]
-pillow = ">=10.0.0"
+dependencies = ["pillow>=10.0.0"]
