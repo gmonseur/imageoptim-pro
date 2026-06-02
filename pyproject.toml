@@ -1,7 +1,11 @@
+[project]
+name = "ImageOptimPro"
+version = "1.0.0"
+dependencies = ["pillow>=10.0.0"]
+
 [tool.flet]
 app_name = "ImageOptimPro"
 description = "Redimensionnez et compressez vos images par lot"
 product_name = "ImageOptim Pro"
 org = "be.gmonseur"
 company = "gmonseur.be"
-dependencies = ["pillow>=10.0.0"]
