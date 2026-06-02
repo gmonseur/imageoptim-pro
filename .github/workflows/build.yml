@@ -56,10 +56,14 @@ jobs:
 
       - name: List build output
         run: |
-          echo "=== Tous les dossiers (depth 6) ==="
-          find . -maxdepth 6 -type d | sort
+          echo "=== Workspace ==="
+          find $GITHUB_WORKSPACE -maxdepth 7 -type d | sort
+          echo "=== ~/.flet ==="
+          find ~/.flet -type d 2>/dev/null || echo "Pas de ~/.flet"
+          echo "=== /tmp flet/flutter ==="
+          find /tmp -maxdepth 6 -type d 2>/dev/null | grep -iE "flet|flutter|image" || echo "Rien dans /tmp"
           echo "=== Binaire ImageOptimPro ==="
-          find / -name "ImageOptimPro" -not -path "*/proc/*" 2>/dev/null || echo "Non trouvé"
+          find /home/runner -name "ImageOptimPro" 2>/dev/null || echo "Non trouvé dans /home/runner"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
