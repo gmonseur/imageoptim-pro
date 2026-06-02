@@ -2,7 +2,6 @@ import asyncio
 import flet as ft
 from PIL import Image
 import os
-import webbrowser
 
 
 def main(page: ft.Page):
@@ -433,12 +432,6 @@ def main(page: ft.Page):
 
     layout = ft.Column(
         controls=[
-            ft.Text("🖼️ ImageOptim Pro",
-                    size=22, weight=ft.FontWeight.BOLD,
-                    color=FG_PRIMARY, text_align=ft.TextAlign.CENTER),
-            ft.Text("Redimensionnez et compressez vos images par lot",
-                    size=11, color=FG_SECONDARY, text_align=ft.TextAlign.CENTER),
-
             section("Dossiers", "📁", ft.Column([
                 ft.Row([
                     ft.Text("Dossier source:",
@@ -507,14 +500,6 @@ def main(page: ft.Page):
             )),
 
             ft.Row([btn_demarrer, btn_annuler, btn_effacer], spacing=10),
-
-            ft.Row([
-                ft.TextButton(
-                    content=ft.Text("Développé par www.gmonseur.be",
-                                    color=ACCENT_BLUE),
-                    on_click=lambda e: webbrowser.open("https://www.gmonseur.be"),
-                ),
-            ], alignment=ft.MainAxisAlignment.CENTER),
         ],
         spacing=15,
         scroll=ft.ScrollMode.AUTO,
