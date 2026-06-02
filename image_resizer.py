@@ -62,6 +62,14 @@ def main(page: ft.Page):
         label_style=ft.TextStyle(color=FG_PRIMARY, size=13),
     )
 
+    check_recursif = ft.Checkbox(
+        label="Inclure les sous-dossiers",
+        value=False,
+        fill_color=ACCENT_GREEN,
+        check_color=FG_PRIMARY,
+        label_style=ft.TextStyle(color=FG_PRIMARY, size=13),
+    )
+
     qualite_label = ft.Text(
         "85%", color=ACCENT_GREEN,
         weight=ft.FontWeight.BOLD, size=13,
@@ -204,10 +212,18 @@ def main(page: ft.Page):
         os.makedirs(dst, exist_ok=True)
 
         extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}
-        images = [
-            f for f in os.listdir(src)
-            if os.path.splitext(f)[1].lower() in extensions
-        ]
+        if check_recursif.value:
+            images = [
+                os.path.relpath(os.path.join(root, f), src)
+                for root, _, files in os.walk(src)
+                for f in files
+                if os.path.splitext(f)[1].lower() in extensions
+            ]
+        else:
+            images = [
+                f for f in os.listdir(src)
+                if os.path.splitext(f)[1].lower() in extensions
+            ]
         total = len(images)
 
         if total == 0:
@@ -234,6 +250,19 @@ def main(page: ft.Page):
         taille_orig_totale = taille_fin_totale = 0
         completed = 0
         sem = asyncio.Semaphore(min(os.cpu_count() or 4, 8))
+        cancel_event = asyncio.Event()
+
+        btn_annuler.visible = True
+        btn_demarrer.visible = False
+        page.update()
+
+        def on_cancel(e):
+            cancel_event.set()
+            btn_annuler.disabled = True
+            progress_label.value = "⏳ Annulation…"
+            page.update()
+
+        btn_annuler.on_click = on_cancel
 
         def _process(filename):
             chemin_src = os.path.join(src, filename)
@@ -252,6 +281,7 @@ def main(page: ft.Page):
                 ext_orig     = os.path.splitext(filename)[1]
                 nouvelle_ext = get_extension(format_sortie, ext_orig)
                 chemin_dst   = os.path.join(dst, nom_base + nouvelle_ext)
+                os.makedirs(os.path.dirname(chemin_dst), exist_ok=True)
 
                 if w_orig > largeur_max:
                     ratio = largeur_max / float(w_orig)
@@ -278,7 +308,11 @@ def main(page: ft.Page):
 
         async def _process_and_report(filename):
             nonlocal completed, taille_orig_totale, taille_fin_totale
+            if cancel_event.is_set():
+                return
             async with sem:
+                if cancel_event.is_set():
+                    return
                 try:
                     dim_label, reduction, t_orig, t_fin = await asyncio.to_thread(_process, filename)
                     taille_orig_totale += t_orig
@@ -293,6 +327,19 @@ def main(page: ft.Page):
 
         await asyncio.gather(*[_process_and_report(f) for f in images])
 
+        btn_annuler.visible = False
+        btn_annuler.disabled = False
+        btn_demarrer.visible = True
+        btn_demarrer.disabled = False
+
+        if cancel_event.is_set():
+            _log(f"\n{'='*60}")
+            _log(f"⚠️ ANNULÉ après {completed}/{total} images")
+            _log(f"{'='*60}\n")
+            progress_label.value = "⚠️ Annulé"
+            page.update()
+            return
+
         eco = (
             ((taille_orig_totale - taille_fin_totale) / taille_orig_totale) * 100
             if taille_orig_totale > 0 else 0
@@ -302,7 +349,6 @@ def main(page: ft.Page):
         _log(f"{'='*60}\n")
 
         progress_label.value = "✅ Terminé!"
-        btn_demarrer.disabled = False
         page.update()
         show_dialog(
             "Succès",
@@ -326,6 +372,16 @@ def main(page: ft.Page):
             padding=ft.Padding.symmetric(horizontal=30, vertical=16),
         ),
         expand=True,
+    )
+
+    btn_annuler = ft.Button(
+        content=ft.Text("⏹ Annuler", size=14, weight=ft.FontWeight.BOLD, color="#ffffff"),
+        bgcolor="#f44336",
+        style=ft.ButtonStyle(
+            padding=ft.Padding.symmetric(horizontal=30, vertical=16),
+        ),
+        expand=True,
+        visible=False,
     )
 
     btn_effacer = ft.Button(
@@ -396,6 +452,7 @@ def main(page: ft.Page):
                     txt_destination,
                     btn_dst,
                 ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                check_recursif,
             ], spacing=10)),
 
             section("Redimensionnement", "📏", ft.Row([
@@ -449,7 +506,7 @@ def main(page: ft.Page):
                 padding=10,
             )),
 
-            ft.Row([btn_demarrer, btn_effacer], spacing=10),
+            ft.Row([btn_demarrer, btn_annuler, btn_effacer], spacing=10),
 
             ft.Row([
                 ft.TextButton(
