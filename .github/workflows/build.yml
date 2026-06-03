@@ -19,7 +19,7 @@ jobs:
           - os: windows-latest
             target: windows
             artifact: ImageOptimPro-Windows
-            path: build/windows/x64/runner/Release
+            path: build/windows
           - os: macos-latest
             target: macos
             artifact: ImageOptimPro-macOS
@@ -56,9 +56,10 @@ jobs:
           PYTHONUTF8: "1"
         run: flet build ${{ matrix.target }} --project ImageOptimPro --module-name image_resizer
 
-      - name: List build output (macOS)
-        if: matrix.os == 'macos-latest'
-        run: find build/macos/Build/Products/Release -maxdepth 1 2>/dev/null || echo "Release dir not found"
+      - name: List build output
+        if: matrix.os != 'ubuntu-latest'
+        shell: bash
+        run: find build -maxdepth 5 -type f -name "*.exe" -o -name "*.app" 2>/dev/null | head -20 || echo "Nothing found"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
