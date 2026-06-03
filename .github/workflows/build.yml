@@ -23,7 +23,7 @@ jobs:
           - os: macos-latest
             target: macos
             artifact: ImageOptimPro-macOS
-            path: build/macos/Build/Products/Release
+            path: build/macos/ImageOptimPro.app
 
     runs-on: ${{ matrix.os }}
 
@@ -56,10 +56,10 @@ jobs:
           PYTHONUTF8: "1"
         run: flet build ${{ matrix.target }} --project ImageOptimPro --module-name image_resizer
 
-      - name: List build output
-        if: matrix.os != 'ubuntu-latest'
+      - name: List build output (Windows)
+        if: matrix.os == 'windows-latest'
         shell: bash
-        run: find build -maxdepth 5 -type f -name "*.exe" -o -name "*.app" 2>/dev/null | head -20 || echo "Nothing found"
+        run: find build -maxdepth 6 -name "*.exe" 2>/dev/null | head -20 || echo "Nothing found"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
