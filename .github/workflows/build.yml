@@ -56,6 +56,12 @@ jobs:
           PYTHONUTF8: "1"
         run: flet build ${{ matrix.target }} --project ImageOptimPro --module-name image_resizer
 
+      - name: Prepare Linux artifact
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cp icon.png install.sh build/linux/
+          chmod +x build/linux/install.sh
+
       - name: List build output (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
