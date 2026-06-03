@@ -1,7 +1,7 @@
 [project]
 name = "ImageOptimPro"
 version = "1.0.0"
-dependencies = ["pillow>=10.0.0", "certifi"]
+dependencies = ["flet==0.85.2", "pillow>=10.0.0", "certifi"]
 
 [tool.flet]
 app_name = "ImageOptimPro"
