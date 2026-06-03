@@ -23,7 +23,7 @@ jobs:
           - os: macos-latest
             target: macos
             artifact: ImageOptimPro-macOS
-            path: build/macos/Build/Products/Release/ImageOptimPro.app
+            path: build/macos/Build/Products/Release
 
     runs-on: ${{ matrix.os }}
 
@@ -55,6 +55,10 @@ jobs:
         env:
           PYTHONUTF8: "1"
         run: flet build ${{ matrix.target }} --project ImageOptimPro --module-name image_resizer
+
+      - name: List build output (macOS)
+        if: matrix.os == 'macos-latest'
+        run: find build/macos/Build/Products/Release -maxdepth 1 2>/dev/null || echo "Release dir not found"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
